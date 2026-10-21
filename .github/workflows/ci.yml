@@ -1,0 +1,35 @@
+# Compila e roda os testes a cada envio para a develop e em pull requests (sem gerar .exe).
+# Roda em Windows e Linux: garante que o núcleo e a interface (Avalonia) continuam
+# independentes do Windows, preparando o suporte futuro ao Linux.
+name: CI
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [main, develop]
+
+# O token do workflow só precisa ler o código.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Compilar
+        run: dotnet build SteamWishlistWidget.sln -c Release
+
+      - name: Testar
+        run: dotnet test SteamWishlistWidget.sln -c Release --no-build

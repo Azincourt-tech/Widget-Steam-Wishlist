@@ -1,0 +1,22 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="SteamWishlistWidget.App"
+             RequestedThemeVariant="Dark">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- As cores do tema são adicionadas pelo ThemeManager ao iniciar e trocadas em tempo real. -->
+                <ResourceInclude Source="avares://SteamWishlistWidget/Styles/Icons.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <FontFamily x:Key="UiFont">avares://SteamWishlistWidget/Assets/Fonts#JetBrainsMono Nerd Font</FontFamily>
+            <CornerRadius x:Key="OverlayCornerRadius">10</CornerRadius>
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://SteamWishlistWidget/Styles/Controls.axaml" />
+    </Application.Styles>
+</Application>

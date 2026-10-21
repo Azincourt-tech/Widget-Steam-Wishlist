@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Interface do widget em Avalonia. Hoje é distribuída só para Windows; o suporte ao Linux
+    está no roadmap (docs/ROADMAP.md). A lógica fica no SteamWishlistWidget.Core.
+  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>SteamWishlistWidget</AssemblyName>
+    <RootNamespace>SteamWishlistWidget</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <Product>Steam Wishlist Widget</Product>
+    <Description>Widget de área de trabalho com a lista de desejos da Steam e suas promoções.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.4" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.4" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- JetBrains Mono embutida no executável (licença SIL OFL 1.1) -->
+    <AvaloniaResource Include="Assets\Fonts\*.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SteamWishlistWidget.Core\SteamWishlistWidget.Core.csproj" />
+  </ItemGroup>
+
+</Project>

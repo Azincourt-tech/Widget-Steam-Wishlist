@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Núcleo do widget, independente de sistema operacional e de framework de interface:
+    modelos, ViewModels, acesso à Steam e configurações. Roda em Windows e Linux.
+    As partes que dependem do sistema ficam atrás de interfaces (Services/Abstractions).
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>SteamWishlistWidget</RootNamespace>
+    <AssemblyName>SteamWishlistWidget.Core</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- MVVM: ObservableObject, [ObservableProperty] e [RelayCommand] -->
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <!-- DPAPI, usada só no Windows (WindowsDataProtector) -->
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SteamWishlistWidget.Tests" />
+  </ItemGroup>
+
+</Project>

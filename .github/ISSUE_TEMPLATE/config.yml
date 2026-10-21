@@ -1,0 +1,9 @@
+# Sem issue em branco: só os formulários de problema e de sugestão.
+blank_issues_enabled: false
+contact_links:
+  - name: Falha de segurança
+    url: https://github.com/Azincourt-tech/Widget-Steam-Wishlist/security/advisories/new
+    about: Reporte em particular, sem abrir uma issue pública.
+  - name: 📖 Guia para contribuidores
+    url: https://github.com/Azincourt-tech/Widget-Steam-Wishlist/blob/develop/docs/CONTRIBUTING.md
+    about: Como o projeto funciona e como enviar melhorias.

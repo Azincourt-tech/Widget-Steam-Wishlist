@@ -1,0 +1,43 @@
+name: 💡 Sugerir uma melhoria
+description: Ideia de funcionalidade ou ajuste no widget.
+title: "[Sugestão] "
+labels: ["sugestão"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Antes de sugerir, veja [o que aceitamos](../blob/main/docs/CONTRIBUTING.md#o-que-aceitamos)
+        e as [implementações futuras](../blob/main/docs/ROADMAP.md): sua ideia pode já estar lá.
+        Regra do projeto: os dados do usuário ficam **somente no PC dele**.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Qual problema isso resolve?
+      placeholder: Eu queria saber quando um jogo da minha lista entra em promoção sem precisar abrir o widget.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Como você imagina a solução?
+      placeholder: Uma notificação do Windows quando um jogo ficar com desconto.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas que você considerou (opcional)
+
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Confirmação
+      options:
+        - label: Verifiquei que a ideia ainda não está nas implementações futuras
+          required: true
+        - label: A ideia mantém os dados do usuário somente no PC dele (sem servidores além da própria Steam)
+          required: true
+        - label: Posso ajudar a implementar

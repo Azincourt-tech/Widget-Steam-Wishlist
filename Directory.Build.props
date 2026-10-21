@@ -1,0 +1,17 @@
+<Project>
+
+  <!-- Configurações comuns a todos os projetos da solução -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+
+    <Version>1.0.0</Version>
+    <Authors>Willian Almeida</Authors>
+    <Copyright>Copyright © 2026 Willian Almeida</Copyright>
+  </PropertyGroup>
+
+</Project>

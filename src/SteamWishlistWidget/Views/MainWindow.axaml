@@ -1,0 +1,190 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:SteamWishlistWidget.ViewModels"
+        xmlns:m="using:SteamWishlistWidget.Models"
+        xmlns:ctl="using:SteamWishlistWidget.Controls"
+        x:Class="SteamWishlistWidget.Views.MainWindow"
+        x:DataType="vm:WidgetViewModel"
+        Title="Steam Wishlist Widget"
+        SizeToContent="WidthAndHeight"
+        WindowDecorations="None"
+        Background="Transparent"
+        TransparencyLevelHint="Transparent"
+        CanResize="False"
+        ShowInTaskbar="False"
+        WindowStartupLocation="Manual"
+        Topmost="{Binding IsPinned}">
+
+    <Window.Styles>
+        <!-- Botões do cabeçalho aparecem ao passar o mouse sobre o painel -->
+        <Style Selector="StackPanel#HeaderButtons">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Border#PanelView:pointerover StackPanel#HeaderButtons">
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+
+        <!-- Linhas da lista -->
+        <Style Selector="Border.row">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="Border.row:pointerover">
+            <Setter Property="Background" Value="{DynamicResource HoverFill}" />
+        </Style>
+        <Style Selector="Panel.dealRow:pointerover Border.separator">
+            <Setter Property="Opacity" Value="0" />
+        </Style>
+        <!-- Sem linha divisória acima do primeiro jogo -->
+        <Style Selector="ItemsControl#DealsList ContentPresenter:nth-child(1) Border.separator">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+    </Window.Styles>
+
+    <Panel>
+        <Panel.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="Atualizar agora" Command="{Binding RefreshCommand}" />
+                <MenuItem Header="Configurações..." Command="{Binding OpenSettingsCommand}" />
+                <Separator />
+                <MenuItem Header="{Binding CollapseMenuHeader}" Command="{Binding ToggleCollapsedCommand}" />
+                <MenuItem Header="Fixar (sempre visível)" ToggleType="CheckBox" IsChecked="{Binding IsPinned, Mode=OneWay}"
+                          Command="{Binding TogglePinCommand}" />
+                <Separator />
+                <MenuItem Header="Fechar" Command="{Binding CloseCommand}" />
+            </ContextMenu>
+        </Panel.ContextMenu>
+
+        <!-- Modo ícone (minimizado) -->
+        <Panel Name="IconView" Width="52" Height="52" IsVisible="False" Cursor="Hand" Background="Transparent"
+               ToolTip.Tip="Lista de desejos Steam (clique para abrir)">
+            <Ellipse Width="44" Height="44" Stroke="#33FFFFFF" StrokeThickness="1">
+                <Ellipse.Fill>
+                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Color="#FF1B2838" Offset="0" />
+                        <GradientStop Color="#FF0E141B" Offset="1" />
+                    </LinearGradientBrush>
+                </Ellipse.Fill>
+            </Ellipse>
+            <PathIcon Data="{StaticResource SteamLogo}" Width="26" Height="26" Foreground="White" />
+            <Border Background="#FF30D158" CornerRadius="9" MinWidth="18" Height="18" Padding="5,0"
+                    HorizontalAlignment="Right" VerticalAlignment="Top" IsVisible="{Binding HasSaleBadge}">
+                <TextBlock Text="{Binding OnSaleCount}" Foreground="White" FontSize="10" FontWeight="Bold"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+        </Panel>
+
+        <!-- Painel completo. A margem dá espaço para a sombra nos temas Escuro e Claro. -->
+        <Panel Name="PanelHost" Margin="14">
+            <Border Name="PanelView" Width="340" CornerRadius="20" Background="{DynamicResource PanelBackground}"
+                    BorderBrush="{DynamicResource PanelBorder}" BorderThickness="1" Padding="14,12,8,10"
+                    BoxShadow="0 6 28 0 #47000000">
+                <StackPanel>
+                    <!-- Cabeçalho -->
+                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto" Background="Transparent" Margin="0,0,6,8">
+                        <Border Grid.RowSpan="2" Width="28" Height="28" CornerRadius="7" Margin="0,0,10,0" VerticalAlignment="Center">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                                    <GradientStop Color="#FF1B2838" Offset="0" />
+                                    <GradientStop Color="#FF2A475E" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <PathIcon Data="{StaticResource SteamLogo}" Width="17" Height="17" Foreground="White" />
+                        </Border>
+
+                        <TextBlock Grid.Column="1" Text="Lista de desejos" Foreground="{DynamicResource TextMain}"
+                                   FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                        <!-- O subtítulo ocupa também a coluna dos botões para não ser cortado -->
+                        <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Subtitle}"
+                                   Foreground="{DynamicResource TextDim}" FontSize="10" Margin="0,1,0,0" />
+
+                        <StackPanel Name="HeaderButtons" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Classes="icon" ToolTip.Tip="Configurações" AutomationProperties.Name="Configurações" Command="{Binding OpenSettingsCommand}">
+                                <PathIcon Data="{StaticResource IconSettings}" />
+                            </Button>
+                            <Button Classes="icon" ToolTip.Tip="Atualizar" AutomationProperties.Name="Atualizar" Command="{Binding RefreshCommand}">
+                                <PathIcon Data="{StaticResource IconRefresh}" />
+                            </Button>
+                            <Button Classes="icon" ToolTip.Tip="{Binding PinToolTip}" AutomationProperties.Name="{Binding PinToolTip}" Command="{Binding TogglePinCommand}">
+                                <Panel>
+                                    <PathIcon Data="{StaticResource IconPin}" IsVisible="{Binding IsPinned}" />
+                                    <PathIcon Data="{StaticResource IconPinOutline}" IsVisible="{Binding !IsPinned}" />
+                                </Panel>
+                            </Button>
+                            <Button Classes="icon" ToolTip.Tip="Minimizar para ícone" AutomationProperties.Name="Minimizar para ícone" Command="{Binding ToggleCollapsedCommand}">
+                                <PathIcon Data="{StaticResource IconMinimize}" />
+                            </Button>
+                            <Button Classes="icon" ToolTip.Tip="Fechar" AutomationProperties.Name="Fechar" Command="{Binding CloseCommand}">
+                                <PathIcon Data="{StaticResource IconClose}" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Configuração inicial -->
+                    <StackPanel IsVisible="{Binding IsSetupVisible}" Margin="0,4,6,4">
+                        <TextBlock Foreground="{DynamicResource TextDim}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,8"
+                                   Text="Cole o link do seu perfil Steam ou o SteamID64. A lista de desejos precisa estar pública." />
+                        <TextBox Name="ProfileInput" Classes="round" Text="{Binding ProfileInput}">
+                            <TextBox.KeyBindings>
+                                <KeyBinding Gesture="Enter" Command="{Binding ConnectCommand}" />
+                            </TextBox.KeyBindings>
+                        </TextBox>
+                        <Button Classes="pill" Content="Conectar" Margin="0,8,0,0" HorizontalAlignment="Stretch"
+                                Command="{Binding ConnectCommand}" />
+                    </StackPanel>
+
+                    <!-- Mensagens de status / erro -->
+                    <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource TextDim}" FontSize="11" TextWrapping="Wrap"
+                               Margin="0,4,6,4" IsVisible="{Binding HasStatus}" />
+
+                    <!-- Lista completa com rolagem -->
+                    <ScrollViewer Name="DealsScroll" MaxHeight="{Binding ListMaxHeight}"
+                                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl Name="DealsList" ItemsSource="{Binding Deals}" Margin="0,0,6,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="m:GameDeal">
+                                    <Panel Classes="dealRow" Height="38">
+                                        <!-- Linha fina entre os itens -->
+                                        <Border Classes="separator" Height="1" VerticalAlignment="Top" Margin="86,0,4,0"
+                                                Background="{DynamicResource Hairline}" />
+
+                                        <Border Classes="row" CornerRadius="8" Padding="4,0" Cursor="Hand" ToolTip.Tip="{Binding Name}">
+                                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                                <Border Width="72" Height="27" CornerRadius="6" ClipToBounds="True"
+                                                        Background="{DynamicResource HoverFill}" VerticalAlignment="Center">
+                                                    <Image ctl:RemoteImage.Url="{Binding ImageUrl}" Stretch="UniformToFill" />
+                                                </Border>
+
+                                                <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="{DynamicResource TextMain}"
+                                                           FontSize="11" FontWeight="Medium" Margin="10,0,8,0" VerticalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis" />
+
+                                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <Border Background="{DynamicResource GreenSoft}" CornerRadius="6" Padding="5,1" Margin="0,0,6,0"
+                                                            VerticalAlignment="Center" IsVisible="{Binding IsDiscounted}">
+                                                        <TextBlock Text="{Binding DiscountText}" Foreground="{DynamicResource Green}" FontSize="10" FontWeight="Bold" />
+                                                    </Border>
+                                                    <StackPanel VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding OriginalPrice}" Foreground="{DynamicResource TextDim}" FontSize="9"
+                                                                   TextDecorations="Strikethrough" HorizontalAlignment="Right"
+                                                                   IsVisible="{Binding IsDiscounted}" />
+                                                        <TextBlock Text="{Binding FinalPrice}" Foreground="{DynamicResource TextMain}" FontSize="11"
+                                                                   FontWeight="Bold" HorizontalAlignment="Right" />
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </Panel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </StackPanel>
+            </Border>
+        </Panel>
+    </Panel>
+</Window>

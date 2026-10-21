@@ -1,0 +1,7 @@
+# Quebras de linha normalizadas no repositório (LF); cada sistema converte ao fazer checkout.
+* text=auto
+
+# Binários: nunca converter.
+*.ttf binary
+*.png binary
+*.ico binary

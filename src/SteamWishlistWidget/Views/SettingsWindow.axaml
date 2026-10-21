@@ -1,0 +1,188 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:SteamWishlistWidget.ViewModels"
+        xmlns:conv="using:SteamWishlistWidget.Converters"
+        x:Class="SteamWishlistWidget.Views.SettingsWindow"
+        x:DataType="vm:SettingsViewModel"
+        Title="Configurações"
+        Width="420"
+        SizeToContent="Height"
+        WindowDecorations="None"
+        Background="Transparent"
+        TransparencyLevelHint="Transparent"
+        CanResize="False"
+        ShowInTaskbar="False"
+        Topmost="True"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CancelCommand}" />
+    </Window.KeyBindings>
+
+    <Window.Styles>
+        <!-- Título de cada grupo -->
+        <Style Selector="TextBlock.section">
+            <Setter Property="Foreground" Value="{DynamicResource TextDim}" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="12,14,0,6" />
+        </Style>
+        <!-- Cartão que agrupa as opções -->
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{DynamicResource CardBackground}" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="12,4" />
+        </Style>
+        <Style Selector="TextBlock.label">
+            <Setter Property="Foreground" Value="{DynamicResource TextMain}" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBlock.hint">
+            <Setter Property="Foreground" Value="{DynamicResource TextDim}" />
+            <Setter Property="FontSize" Value="9.5" />
+            <Setter Property="Margin" Value="0,2,0,0" />
+        </Style>
+        <Style Selector="Grid.row">
+            <Setter Property="MinHeight" Value="40" />
+        </Style>
+        <Style Selector="Border.divider">
+            <Setter Property="Height" Value="1" />
+            <Setter Property="Background" Value="{DynamicResource Hairline}" />
+        </Style>
+    </Window.Styles>
+
+    <Border Margin="16" CornerRadius="20" Background="{DynamicResource WindowBackground}"
+            BorderBrush="{DynamicResource PanelBorder}" BorderThickness="1" Padding="16,14,16,16"
+            BoxShadow="0 8 30 0 #59000000">
+        <StackPanel>
+            <!-- Título (arrastar a janela por aqui) -->
+            <Grid Name="TitleBar" Background="Transparent">
+                <TextBlock Text="Configurações" Foreground="{DynamicResource TextMain}" FontSize="15" FontWeight="Bold"
+                           VerticalAlignment="Center" />
+                <Button Classes="icon" HorizontalAlignment="Right" ToolTip.Tip="Fechar" AutomationProperties.Name="Fechar" Command="{Binding CancelCommand}">
+                    <PathIcon Data="{StaticResource IconClose}" />
+                </Button>
+            </Grid>
+
+            <!-- Aparência -->
+            <TextBlock Classes="section" Text="APARÊNCIA" />
+            <Border Classes="card">
+                <Grid Classes="row">
+                    <TextBlock Classes="label" Text="Tema" />
+                    <Border Classes="segmentTrack">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton Theme="{StaticResource SegmentTheme}" GroupName="Theme" Content="Escuro"
+                                         IsChecked="{Binding Theme, Converter={x:Static conv:ValueEqualsConverter.Instance}, ConverterParameter=Dark}" />
+                            <RadioButton Theme="{StaticResource SegmentTheme}" GroupName="Theme" Content="Claro"
+                                         IsChecked="{Binding Theme, Converter={x:Static conv:ValueEqualsConverter.Instance}, ConverterParameter=Light}" />
+                            <RadioButton Theme="{StaticResource SegmentTheme}" GroupName="Theme" Content="Vidro"
+                                         IsChecked="{Binding Theme, Converter={x:Static conv:ValueEqualsConverter.Instance}, ConverterParameter=Glass}" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- Conta -->
+            <TextBlock Classes="section" Text="PERFIL STEAM" />
+            <Border Classes="card" Padding="12,10">
+                <StackPanel>
+                    <TextBox Classes="round" Text="{Binding ProfileInput}" />
+                    <TextBlock Classes="hint" Text="Link do perfil ou SteamID64" TextWrapping="Wrap" Margin="2,6,0,0" />
+                </StackPanel>
+            </Border>
+
+            <!-- Loja -->
+            <TextBlock Classes="section" Text="LOJA" />
+            <Border Classes="card">
+                <StackPanel>
+                    <Grid Classes="row">
+                        <TextBlock Classes="label" Text="Idioma" />
+                        <Border Classes="segmentTrack">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Theme="{StaticResource SegmentTheme}" GroupName="Language" Content="Português"
+                                             IsChecked="{Binding Language, Converter={x:Static conv:ValueEqualsConverter.Instance}, ConverterParameter=brazilian}" />
+                                <RadioButton Theme="{StaticResource SegmentTheme}" GroupName="Language" Content="English"
+                                             IsChecked="{Binding Language, Converter={x:Static conv:ValueEqualsConverter.Instance}, ConverterParameter=english}" />
+                                <RadioButton Theme="{StaticResource SegmentTheme}" GroupName="Language" Content="Español"
+                                             IsChecked="{Binding Language, Converter={x:Static conv:ValueEqualsConverter.Instance}, ConverterParameter=latam}" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                    <Border Classes="divider" />
+                    <Grid Classes="row">
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Classes="label" Text="País (moeda)" />
+                            <TextBlock Classes="hint" Text="Código de 2 letras: BR, US, PT, AR, MX..." />
+                        </StackPanel>
+                        <TextBox Classes="round" Width="64" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                 MaxLength="2" TextAlignment="Center" Text="{Binding CountryCode}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Lista -->
+            <TextBlock Classes="section" Text="LISTA" />
+            <Border Classes="card">
+                <StackPanel>
+                    <Grid Classes="row">
+                        <TextBlock Classes="label" Text="Jogos visíveis" />
+                        <Border Classes="segmentTrack">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Theme="{StaticResource SegmentTheme}" GroupName="Rows" Content="3"
+                                             IsChecked="{Binding VisibleRows, Converter={x:Static conv:ValueEqualsConverter.Instance}, ConverterParameter=3}" />
+                                <RadioButton Theme="{StaticResource SegmentTheme}" GroupName="Rows" Content="5"
+                                             IsChecked="{Binding VisibleRows, Converter={x:Static conv:ValueEqualsConverter.Instance}, ConverterParameter=5}" />
+                                <RadioButton Theme="{StaticResource SegmentTheme}" GroupName="Rows" Content="8"
+                                             IsChecked="{Binding VisibleRows, Converter={x:Static conv:ValueEqualsConverter.Instance}, ConverterParameter=8}" />
+                                <RadioButton Theme="{StaticResource SegmentTheme}" GroupName="Rows" Content="10"
+                                             IsChecked="{Binding VisibleRows, Converter={x:Static conv:ValueEqualsConverter.Instance}, ConverterParameter=10}" />
+                                <RadioButton Theme="{StaticResource SegmentTheme}" GroupName="Rows" Content="15"
+                                             IsChecked="{Binding VisibleRows, Converter={x:Static conv:ValueEqualsConverter.Instance}, ConverterParameter=15}" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                    <Border Classes="divider" />
+                    <Grid Classes="row">
+                        <TextBlock Classes="label" Text="Atualizar a cada" />
+                        <Border Classes="segmentTrack">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Theme="{StaticResource SegmentTheme}" GroupName="Interval" Content="15m"
+                                             IsChecked="{Binding RefreshMinutes, Converter={x:Static conv:ValueEqualsConverter.Instance}, ConverterParameter=15}" />
+                                <RadioButton Theme="{StaticResource SegmentTheme}" GroupName="Interval" Content="30m"
+                                             IsChecked="{Binding RefreshMinutes, Converter={x:Static conv:ValueEqualsConverter.Instance}, ConverterParameter=30}" />
+                                <RadioButton Theme="{StaticResource SegmentTheme}" GroupName="Interval" Content="1h"
+                                             IsChecked="{Binding RefreshMinutes, Converter={x:Static conv:ValueEqualsConverter.Instance}, ConverterParameter=60}" />
+                                <RadioButton Theme="{StaticResource SegmentTheme}" GroupName="Interval" Content="3h"
+                                             IsChecked="{Binding RefreshMinutes, Converter={x:Static conv:ValueEqualsConverter.Instance}, ConverterParameter=180}" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                    <Border Classes="divider" />
+                    <Grid Classes="row">
+                        <TextBlock Classes="label" Text="Mostrar só promoções" />
+                        <CheckBox Theme="{StaticResource SwitchTheme}" VerticalAlignment="Center" IsChecked="{Binding OnlyDiscounted}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Sistema -->
+            <TextBlock Classes="section" Text="SISTEMA" />
+            <Border Classes="card">
+                <Grid Classes="row">
+                    <TextBlock Classes="label" Text="Iniciar com o Windows" />
+                    <CheckBox Theme="{StaticResource SwitchTheme}" VerticalAlignment="Center" IsChecked="{Binding StartWithWindows}" />
+                </Grid>
+            </Border>
+
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource Danger}" FontSize="11" TextWrapping="Wrap"
+                       Margin="4,12,4,0" IsVisible="{Binding HasError}" />
+
+            <!-- Ações. O botão Salvar fica desabilitado enquanto valida o perfil. -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+                <Button Classes="pill secondary" Content="Cancelar" Margin="0,0,8,0" Command="{Binding CancelCommand}" />
+                <Button Classes="pill" Content="Salvar" IsDefault="True" Command="{Binding SaveCommand}" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>
