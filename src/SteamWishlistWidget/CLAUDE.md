@@ -1,6 +1,6 @@
 # SteamWishlistWidget (interface Avalonia)
 
-Interface do widget em **Avalonia 12.1.4**, alvo `net10.0`. A lógica está no `SteamWishlistWidget.Core`; aqui ficam só telas, temas, estilos e o que é de cada sistema (`Platform/`).
+Interface do widget em **Avalonia 12.1.4**. Alvo `net10.0-windows10.0.19041.0` quando compilado no Windows (exigido pelo pacote de notificações; código só do Windows dentro de `#if WINDOWS`) e `net10.0` fora dele. A lógica está no `SteamWishlistWidget.Core`; aqui ficam só telas, temas, estilos e o que é de cada sistema (`Platform/`).
 
 ## Regras
 
@@ -29,7 +29,7 @@ Interface do widget em **Avalonia 12.1.4**, alvo `net10.0`. A lógica está no `
 ```powershell
 dotnet build src/SteamWishlistWidget -c Release
 # Abre no modo demonstração; capture a janela pelo retângulo da UI Automation e confira a imagem.
-Start-Process src/SteamWishlistWidget/bin/Release/net10.0/SteamWishlistWidget.exe -ArgumentList "--demo","--theme=Glass"
+Start-Process src/SteamWishlistWidget/bin/Release/net10.0-windows10.0.19041.0/SteamWishlistWidget.exe -ArgumentList "--demo","--theme=Glass"
 ```
 
 Os botões do cabeçalho podem ser acionados por UI Automation pelo nome (`Configurações`, `Atualizar`, `Fixar (sempre visível)`, `Minimizar para ícone`, `Fechar`), sem mover o mouse do usuário. As imagens do README (`docs/*.png`) são geradas assim, no modo demonstração.

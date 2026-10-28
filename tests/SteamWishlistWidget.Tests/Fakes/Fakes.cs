@@ -99,3 +99,9 @@ internal sealed class FakeSecretProtector : ISecretProtector
         }
     }
 }
+internal sealed class FakeNotificationService : INotificationService
+{
+    public List<GameDeal> Notified { get; } = [];
+
+    public void NotifySale(GameDeal deal) => Notified.Add(deal);
+}

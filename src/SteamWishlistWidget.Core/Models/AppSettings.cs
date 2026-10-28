@@ -25,6 +25,7 @@ public partial class AppSettings
     public int VisibleRows { get; set; } = DefaultVisibleRows;
     public int RefreshMinutes { get; set; } = DefaultRefreshMinutes;
     public bool OnlyDiscounted { get; set; }
+    public bool Notifications { get; set; } = true;
     public bool Pinned { get; set; }
     public bool Collapsed { get; set; }
     public double? Left { get; set; }

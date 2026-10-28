@@ -1,4 +1,5 @@
 using SteamWishlistWidget.Platform.Windows;
+using SteamWishlistWidget.Services;
 using SteamWishlistWidget.Services.Abstractions;
 using SteamWishlistWidget.Services.Security;
 
@@ -23,4 +24,12 @@ public static class PlatformServices
         OperatingSystem.IsWindows()
             ? new WindowsStartupRegistration()
             : throw new PlatformNotSupportedException(NotSupportedMessage);
+
+    /// <summary>Sem notificação implementada para o sistema, o widget segue normal, só sem avisos.</summary>
+    public static INotificationService CreateNotificationService() =>
+#if WINDOWS
+        new WindowsNotificationService();
+#else
+        new NoNotificationService();
+#endif
 }

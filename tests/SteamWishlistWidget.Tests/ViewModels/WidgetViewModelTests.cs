@@ -14,10 +14,11 @@ public class WidgetViewModelTests
     private readonly FakeStoreLauncher _launcher = new();
     private readonly FakeThemeService _themes = new();
     private readonly FakeDialogService _dialogs = new();
+    private readonly FakeNotificationService _notifications = new();
     private readonly FakeUiTimer _timer = new();
 
     private WidgetViewModel Create(AppSettings settings) =>
-        new(settings, _steam, _store, _launcher, _themes, _dialogs, _timer);
+        new(settings, _steam, _store, _launcher, _themes, _dialogs, _notifications, _timer);
 
     private static GameDeal Deal(int id, int discount) =>
         new(id, $"Jogo {id}", "R$10,00", discount > 0 ? "R$20,00" : null, discount, 1000, null);
@@ -151,5 +152,55 @@ public class WidgetViewModelTests
         vm.CloseCommand.Execute(null);
 
         Assert.True(closed);
+    }
+
+    [Fact]
+    public async Task Refresh_GameEntersSale_NotifiesOnlyAfterBaseline()
+    {
+        _steam.Deals = [Deal(1, 50), Deal(2, 0)];
+        var vm = Create(new AppSettings { SteamId = SteamId });
+
+        await vm.InitializeAsync();
+        Assert.Empty(_notifications.Notified);
+
+        _steam.Deals = [Deal(1, 50), Deal(2, 30)];
+        await vm.RefreshCommand.ExecuteAsync(null);
+        vm.Shutdown();
+
+        Assert.Equal([2], _notifications.Notified.Select(d => d.AppId));
+    }
+
+    [Fact]
+    public async Task Refresh_NotificationsOff_DoesNotNotify()
+    {
+        _steam.Deals = [Deal(1, 0)];
+        var vm = Create(new AppSettings { SteamId = SteamId, Notifications = false });
+
+        await vm.RefreshCommand.ExecuteAsync(null);
+        _steam.Deals = [Deal(1, 30)];
+        await vm.RefreshCommand.ExecuteAsync(null);
+
+        Assert.Empty(_notifications.Notified);
+    }
+
+    [Fact]
+    public async Task OpenSettings_ChangedCountry_ResetsBaseline()
+    {
+        _steam.Deals = [Deal(1, 0)];
+        var vm = Create(new AppSettings { SteamId = SteamId });
+        await vm.RefreshCommand.ExecuteAsync(null);
+
+        // Na loja de outro país o jogo já está em promoção: é a nova base, não um aviso.
+        _steam.Deals = [Deal(1, 30)];
+        _dialogs.OnShowSettings = s =>
+        {
+            s.CountryCode = "US";
+            return true;
+        };
+        await vm.OpenSettingsCommand.ExecuteAsync(null);
+        vm.Shutdown();
+
+        Assert.Equal(2, _steam.WishlistCalls);
+        Assert.Empty(_notifications.Notified);
     }
 }

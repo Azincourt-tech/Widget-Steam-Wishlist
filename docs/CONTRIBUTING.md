@@ -36,7 +36,7 @@ A ideia do widget é ser **leve, simples e seguro**: mostrar a lista de desejos 
 | 🗣️ Tradução da interface | Hoje os textos estão fixos em português; abra uma issue antes para combinarmos como separar os textos |
 | 🎨 Novos temas | Com todas as chaves de cor; veja a [receita](#adicionar-um-novo-tema) |
 | ♿ Acessibilidade | Navegação por teclado, contraste, leitor de tela |
-| ✨ Funcionalidades pequenas | Alinhadas com a proposta do widget, por exemplo: filtro por preço máximo, notificação quando um jogo entrar em promoção, mostrar até quando vai a promoção |
+| ✨ Funcionalidades pequenas | Alinhadas com a proposta do widget, por exemplo: filtro por preço máximo, mostrar até quando vai a promoção |
 | 🧪 Testes e 📖 documentação | Sempre bem-vindos |
 
 ### 💬 Só com uma issue discutida antes
@@ -110,7 +110,7 @@ SteamWishlistWidget/
 │   │   │   ├── WidgetViewModel.cs       Estado e ações do widget (lista, fixar, minimizar...)
 │   │   │   └── SettingsViewModel.cs     Estado e validação da tela de configurações
 │   │   └── Services/
-│   │       ├── Abstractions/            Interfaces (Steam, config, timer, criptografia, telas...)
+│   │       ├── Abstractions/            Interfaces (Steam, config, timer, criptografia, telas, notificações...)
 │   │       ├── Demo/                    Serviços com dados fictícios para o modo demonstração
 │   │       ├── Security/                WindowsDataProtector (DPAPI)
 │   │       ├── SteamApiClient.cs        Chamadas às APIs da Steam e leitura das respostas
@@ -118,15 +118,17 @@ SteamWishlistWidget/
 │   │       ├── WishlistSorter.cs        Promoções primeiro, depois mais baratos
 │   │       ├── SettingsStore.cs         Lê e grava o config.json (atômico, validado)
 │   │       ├── StoreLauncher.cs         Abre a página do jogo na loja
+│   │       ├── SaleAlertTracker.cs      Descobre os jogos que entraram agora em promoção
+│   │       ├── NoNotificationService.cs Notificação que não faz nada (modo demonstração, outros sistemas)
 │   │       └── ErrorLog.cs              Log de erros local
 │   └── SteamWishlistWidget/             Interface em Avalonia
 │       ├── Program.cs                   Ponto de entrada: cópia única e erros globais
 │       ├── App.axaml(.cs)               Monta os serviços (composition root) e aplica o tema
-│       ├── Assets/Fonts/                JetBrains Mono embutida no executável
+│       ├── Assets/                      icon.ico (ícone do .exe e das janelas) e Fonts/ (JetBrains Mono embutida)
 │       ├── Controls/RemoteImage.cs      Carrega as capas dos jogos da internet
 │       ├── Converters/                  Conversores de binding (ex.: RadioButton ↔ valor)
 │       ├── Platform/                    Escolha da implementação por sistema e timer da interface
-│       │   └── Windows/                 Registro (iniciar com o Windows) e cantos da janela (DWM)
+│       │   └── Windows/                 Registro (iniciar com o Windows), notificações e cantos da janela (DWM)
 │       ├── Styles/                      Controls.axaml (estilos) e Icons.axaml (ícones vetoriais)
 │       ├── Themes/                      Dark.axaml, Light.axaml, Glass.axaml, ThemeManager e ThemeService
 │       └── Views/                       MainWindow, SettingsWindow e DialogService
@@ -157,7 +159,7 @@ flowchart LR
 | **Views** | `SteamWishlistWidget/Views` | XAML, bindings e comportamento puramente visual: arrastar a janela, efeito vidro, sombra por tema, manter a borda no lugar ao minimizar | Conter regra de negócio, chamar a Steam ou gravar configurações |
 | **ViewModels** | `Core/ViewModels` | Estado da tela (`[ObservableProperty]`) e ações (`[RelayCommand]`) | Referenciar janelas, Avalonia ou classes concretas de serviço |
 | **Services** | `Core/Services` | Acesso à Steam, configurações, log | Conhecer ViewModels, telas ou APIs de um sistema específico |
-| **Platform** | `SteamWishlistWidget/Platform` | O que muda por sistema: timer da interface, iniciar com o sistema, criptografia, cantos da janela | Ter regra de negócio |
+| **Platform** | `SteamWishlistWidget/Platform` | O que muda por sistema: timer da interface, iniciar com o sistema, criptografia, notificações, cantos da janela | Ter regra de negócio |
 | **App.axaml.cs** | `SteamWishlistWidget` | Único lugar que cria os serviços e entrega a quem precisa | Ter lógica além da montagem |
 
 Os ViewModels recebem **interfaces** (`Core/Services/Abstractions`). Isso permite trocar a implementação real por uma falsa nos testes e por outra implementação em cada sistema operacional.
@@ -193,6 +195,7 @@ sequenceDiagram
         API->>API: WishlistSorter.Sort
         API-->>VM: lista ordenada
         VM->>VM: atualiza Deals, contagem e subtítulo
+        VM->>VM: SaleAlertTracker (a primeira leitura é só a base)
     end
     loop a cada N minutos (IUiTimer)
         VM->>API: GetWishlistDealsAsync
@@ -227,6 +230,15 @@ Observações:
 > ⚠️ O desfoque do Windows cobre o retângulo inteiro da janela e ignora cantos desenhados pela interface. O único recorte que ele respeita é o arredondamento nativo da moldura. Por isso, no tema Vidro, o painel usa `WindowsCorners.SystemCornerRadius` (8 px) em vez dos 20 px dos outros temas. Para conferir os cantos, coloque o widget sobre um fundo listrado: um fundo liso desfocado continua igual e esconde o problema.
 
 > ⚠️ O Avalonia compila os `ResourceInclude` do XAML, e eles deixam de ser identificáveis depois. Por isso o tema não é declarado no `App.axaml`: o `ThemeManager` guarda a referência do dicionário que ele mesmo adicionou.
+
+## Ícone e notificações
+
+- **Ícone:** `Assets/icon.ico` (16 a 256 px, PNG dentro do `.ico`) vira o ícone do `.exe` (`ApplicationIcon`) e das janelas (`Icon`). `docs/icon.png` é a versão de 256 px. O desenho (coração com etiqueta de desconto) é próprio; não use o logo da Steam, para não sugerir que o widget é oficial da Valve.
+- **Quando avisar:** depois de cada leitura, o `WidgetViewModel` passa a lista ao `SaleAlertTracker`, que devolve só os jogos que **entraram agora** em promoção. A primeira leitura é só a base (abrir o widget não avisa nada). Trocar de perfil, país ou idioma zera a base. Se o jogo sair da promoção e voltar, avisa de novo. Com o interruptor desligado, a base continua sendo atualizada, para não chegar uma enxurrada de avisos ao religar.
+- **Como avisar:** `INotificationService`. No Windows, `Platform/Windows/WindowsNotificationService.cs` usa o pacote `Microsoft.Toolkit.Uwp.Notifications`; no modo demonstração e fora do Windows, `NoNotificationService`.
+- O pacote exige o alvo do Windows 10: no Windows o app compila como `net10.0-windows10.0.19041.0` (a pasta de saída é `bin/<Config>/net10.0-windows10.0.19041.0/`), fora dele como `net10.0`, e o código fica dentro de `#if WINDOWS`. O csproj fixa o `System.Drawing.Common` 10.0.0, porque o pacote puxa a 4.7.0, que tem falha de segurança conhecida.
+- Na primeira notificação, o pacote registra o widget em `HKCU\Software\Classes\AppUserModelId\<caminho do exe>`, com o nome do `AssemblyTitle` e o ícone do `.exe`.
+- Para conferir sem esperar uma promoção de verdade: num projeto de console temporário que referencie o app, chame `new WindowsNotificationService().NotifySale(...)` com um jogo fictício, leia `ToastNotificationManagerCompat.History.GetHistory()` e termine com `ToastNotificationManagerCompat.Uninstall()` para apagar o registro do console.
 
 ## Configurações do usuário
 
@@ -271,8 +283,9 @@ O que já está coberto:
 - Leitura de links e SteamID (`SteamIdParserTests`)
 - Leitura das respostas da Steam, incluindo respostas inesperadas e XML malicioso (`SteamApiClientParsingTests`)
 - Ordenação da lista (`WishlistSorterTests`)
+- Quais jogos entraram em promoção entre duas leituras (`SaleAlertTrackerTests`)
 - Criptografia, migração e validação das configurações (`SettingsStoreTests`)
-- ViewModels: carregar a lista, erro de rede, conectar perfil, fixar, minimizar, abrir a loja, salvar e cancelar configurações
+- ViewModels: carregar a lista, erro de rede, conectar perfil, fixar, minimizar, abrir a loja, avisar promoções novas, salvar e cancelar configurações
 
 Toda mudança de comportamento deve vir com teste.
 
@@ -284,7 +297,7 @@ Toda mudança de comportamento deve vir com teste.
 dotnet publish src/SteamWishlistWidget -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish
 ```
 
-O `.exe` fica com cerca de 52 MB, porque leva o .NET junto e por isso não exige nada instalado no PC do usuário. Sem trimming: Avalonia e System.Text.Json usam reflexão.
+O `.exe` fica com cerca de 60 MB, porque leva o .NET junto (e a ponte para as APIs do Windows 10 usadas nas notificações) e por isso não exige nada instalado no PC do usuário. Sem trimming: Avalonia e System.Text.Json usam reflexão.
 
 **Branches**
 - O trabalho vai na `develop` (e nos pull requests para ela).
@@ -364,6 +377,7 @@ O workflow lê a versão, **para se a release `v<Version>` já existir** (é pre
 | Log de erros | `%LocalAppData%\SteamWishlistWidget\logs\error.log` |
 | Começar do zero | Feche o widget e apague a pasta `%AppData%\SteamWishlistWidget` |
 | Desligar "Iniciar com o Windows" à mão | Valor `SteamWishlistWidget` em `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` |
+| Registro das notificações | `HKCU\Software\Classes\AppUserModelId\<caminho do exe>` (criado na primeira notificação) |
 
 Dicas:
 

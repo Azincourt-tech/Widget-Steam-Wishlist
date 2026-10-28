@@ -5,6 +5,7 @@
         x:Class="SteamWishlistWidget.Views.SettingsWindow"
         x:DataType="vm:SettingsViewModel"
         Title="Configurações"
+        Icon="/Assets/icon.ico"
         Width="420"
         SizeToContent="Height"
         WindowDecorations="None"
@@ -169,10 +170,17 @@
             <!-- Sistema -->
             <TextBlock Classes="section" Text="SISTEMA" />
             <Border Classes="card">
-                <Grid Classes="row">
-                    <TextBlock Classes="label" Text="Iniciar com o Windows" />
-                    <CheckBox Theme="{StaticResource SwitchTheme}" VerticalAlignment="Center" IsChecked="{Binding StartWithWindows}" />
-                </Grid>
+                <StackPanel>
+                    <Grid Classes="row">
+                        <TextBlock Classes="label" Text="Iniciar com o Windows" />
+                        <CheckBox Theme="{StaticResource SwitchTheme}" VerticalAlignment="Center" IsChecked="{Binding StartWithWindows}" />
+                    </Grid>
+                    <Border Classes="divider" />
+                    <Grid Classes="row">
+                        <TextBlock Classes="label" Text="Avisar quando um jogo entrar em promoção" />
+                        <CheckBox Theme="{StaticResource SwitchTheme}" VerticalAlignment="Center" IsChecked="{Binding Notifications}" />
+                    </Grid>
+                </StackPanel>
             </Border>
 
             <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource Danger}" FontSize="11" TextWrapping="Wrap"

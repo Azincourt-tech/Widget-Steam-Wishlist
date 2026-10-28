@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/icon.png" alt="Ícone do Steam Wishlist Widget" width="96" />
+
 # 🎮 Steam Wishlist Widget
 
 **Sua lista de desejos da Steam na área de trabalho do Windows, com as promoções sempre no topo.**
@@ -29,6 +31,7 @@
 | 🔽 **Modo ícone** | Minimiza para um ícone da Steam com o número de jogos em promoção |
 | 📌 **Fixar** | Mantém o widget sempre visível sobre as outras janelas |
 | 🔄 **Atualização automática** | A cada 15 min, 30 min, 1 h ou 3 h |
+| 🔔 **Aviso de promoção** | Notificação do Windows quando um jogo da lista entra em promoção |
 | 🚀 **Inicia com o Windows** | Opcional |
 | 🔒 **Sem login** | Não pede senha nem conta; só o link do seu perfil |
 
@@ -84,8 +87,11 @@ Abra pelo ícone de engrenagem ou pelo clique direito → **Configurações...**
 | **Atualizar a cada** | 15 min, 30 min, 1 h, 3 h |
 | **Só promoções** | Esconde os jogos sem desconto |
 | **Iniciar com o Windows** | Liga ou desliga |
+| **Avisar quando um jogo entrar em promoção** | Liga ou desliga (vem ligado) |
 
 O tema muda na hora enquanto você escolhe; **Cancelar** volta ao anterior.
+
+O aviso de promoção vem na próxima atualização da lista depois que o desconto começa. Jogos que já estavam em promoção quando o widget abriu não geram aviso. As notificações respeitam o **Não incomodar** do Windows.
 
 <br clear="right" />
 

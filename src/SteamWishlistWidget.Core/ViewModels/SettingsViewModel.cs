@@ -45,6 +45,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         VisibleRows = settings.VisibleRows;
         RefreshMinutes = settings.RefreshMinutes;
         OnlyDiscounted = settings.OnlyDiscounted;
+        Notifications = settings.Notifications;
         StartWithWindows = startup.IsEnabled;
         _initialized = true;
     }
@@ -69,6 +70,9 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _onlyDiscounted;
+
+    [ObservableProperty]
+    private bool _notifications = true;
 
     [ObservableProperty]
     private bool _startWithWindows;
@@ -130,6 +134,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         updated.VisibleRows = VisibleRows;
         updated.RefreshMinutes = RefreshMinutes;
         updated.OnlyDiscounted = OnlyDiscounted;
+        updated.Notifications = Notifications;
         updated.Normalize();
 
         try
@@ -160,5 +165,6 @@ public sealed partial class SettingsViewModel : ObservableObject
         target.VisibleRows = source.VisibleRows;
         target.RefreshMinutes = source.RefreshMinutes;
         target.OnlyDiscounted = source.OnlyDiscounted;
+        target.Notifications = source.Notifications;
     }
 }

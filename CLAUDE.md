@@ -17,7 +17,7 @@ Documentação completa para desenvolvedores: [docs/CONTRIBUTING.md](docs/CONTRI
 
 ```bash
 dotnet build SteamWishlistWidget.sln            # precisa terminar com 0 avisos (avisos são erro)
-dotnet test SteamWishlistWidget.sln             # 61 testes hoje, rodam em qualquer sistema
+dotnet test SteamWishlistWidget.sln             # 69 testes hoje, rodam em qualquer sistema
 dotnet run --project src/SteamWishlistWidget    # abre o widget com o perfil real do usuário
 dotnet run --project src/SteamWishlistWidget -- --demo --theme=Dark   # dados fictícios (Dark|Light|Glass)
 ```
@@ -62,7 +62,7 @@ O widget só abre uma cópia por vez (mutex). Antes de recompilar, feche o widge
 - **GitHub Actions:** `ci.yml` (build e testes em Windows e Ubuntu, em push na `develop` e em PR) e `release.yml` (push na `main`: testes, `.exe` único e release `v<Version>` com `SteamWishlistWidget-v<Version>-win-x64.exe`; falha se a release já existir, então suba a `<Version>` do `Directory.Build.props` antes). `dependabot.yml` abre PRs semanais para a `develop`; `SECURITY.md` aponta o reporte privado de falhas.
 - Pendências no GitHub (feitas pelo usuário na interface web): ligar o reporte privado de falhas, alertas e correções do Dependabot, secret scanning com push protection, regras de proteção da `main`/`develop` e criar as etiquetas `sugestão` e `good first issue`.
 - Histórico relevante: começou em WPF, foi migrado para MVVM, depois para .NET 10 e por fim para Avalonia 12 (o WPF foi removido). A separação em `Core` foi feita para permitir o Linux.
-- Próximos passos possíveis (detalhes no ROADMAP): verificar e instalar atualizações, tela de detalhes do jogo, suporte a Linux (AppImage primeiro, Flatpak depois), filtro por preço, notificações, tradução, acessibilidade, login com a Steam (em estudo).
+- Próximos passos possíveis (detalhes no ROADMAP): verificar e instalar atualizações, tela de detalhes do jogo, suporte a Linux (AppImage primeiro, Flatpak depois), filtro por preço, tamanhos do widget, tradução, acessibilidade, login com a Steam (em estudo).
 
 ## Arquivos do usuário (fora do repositório)
 

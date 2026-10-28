@@ -67,12 +67,15 @@ public class SettingsViewModelTests
         vm.CountryCode = "us";
         vm.RefreshMinutes = 30;
         vm.StartWithWindows = true;
+        vm.Notifications = false;
         await vm.SaveCommand.ExecuteAsync(null);
 
         Assert.True(result);
         Assert.Equal(OtherSteamId, settings.SteamId);
         Assert.Equal("US", settings.CountryCode);
         Assert.Equal(30, settings.RefreshMinutes);
+        Assert.False(settings.Notifications);
+        Assert.False(_store.LastSaved?.Notifications);
         Assert.Equal(OtherSteamId, _store.LastSaved?.SteamId);
         Assert.True(_startup.IsEnabled);
     }

@@ -22,7 +22,9 @@ public sealed partial class WidgetViewModel : ObservableObject
     private readonly IStoreLauncher _launcher;
     private readonly IThemeService _themes;
     private readonly IDialogService _dialogs;
+    private readonly INotificationService _notifications;
     private readonly IUiTimer _timer;
+    private readonly SaleAlertTracker _saleAlerts = new();
     private readonly CancellationTokenSource _lifetime = new();
     private readonly bool _initialized;
     private bool _loading;
@@ -34,9 +36,11 @@ public sealed partial class WidgetViewModel : ObservableObject
         IStoreLauncher launcher,
         IThemeService themes,
         IDialogService dialogs,
+        INotificationService notifications,
         IUiTimer timer)
     {
         _timer = timer;
+        _notifications = notifications;
         _settings = settings;
         _steam = steam;
         _store = store;
@@ -147,6 +151,7 @@ public sealed partial class WidgetViewModel : ObservableObject
             OnSaleCount = deals.Count(d => d.IsDiscounted);
             Subtitle = $"{OnSaleCount} de {deals.Count} em promoção · {DateTime.Now:HH:mm}";
             StatusMessage = deals.Count == 0 ? "Nenhum jogo da lista está em promoção agora." : null;
+            NotifyNewSales(deals);
         }
         catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
         {
@@ -172,6 +177,7 @@ public sealed partial class WidgetViewModel : ObservableObject
         {
             _settings.SteamId = await _steam.ResolveSteamIdAsync(ProfileInput, _lifetime.Token);
             SaveSettings();
+            _saleAlerts.Reset();
             IsSetupVisible = false;
             _timer.Start();
             await RefreshAsync();
@@ -219,6 +225,11 @@ public sealed partial class WidgetViewModel : ObservableObject
         }
 
         var current = (_settings.SteamId, _settings.Language, _settings.CountryCode, _settings.OnlyDiscounted);
+
+        // Outro perfil ou outra loja: a próxima leitura vira a nova base, sem avisar o que já estava em promoção.
+        if ((current.SteamId, current.Language, current.CountryCode) != (previous.SteamId, previous.Language, previous.CountryCode))
+            _saleAlerts.Reset();
+
         if (current != previous || Deals.Count == 0)
             await RefreshAsync();
     }
@@ -272,6 +283,20 @@ public sealed partial class WidgetViewModel : ObservableObject
             _timer.Stop();
             _timer.Start();
         }
+    }
+
+    /// <summary>
+    /// Avisa os jogos que entraram em promoção desde a leitura anterior. A base é atualizada
+    /// mesmo com os avisos desligados, para não avisar de uma vez tudo o que mudou ao religar.
+    /// </summary>
+    private void NotifyNewSales(IReadOnlyList<GameDeal> deals)
+    {
+        var entered = _saleAlerts.Update(deals);
+        if (!_settings.Notifications)
+            return;
+
+        foreach (var deal in entered)
+            _notifications.NotifySale(deal);
     }
 
     private void SaveSettings()

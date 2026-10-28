@@ -14,7 +14,6 @@ Itens marcados com **🔁 Ai Usage** já existem no projeto irmão [Widget Ai Us
 
 | Ideia | Dificuldade | Bom para começar |
 |---|---|---|
-| [Ícone próprio do app](#-ícone-próprio-do-app) 🔁 | 🟢 | ✅ |
 | [README mais completo](#-readme-mais-completo) 🔁 | 🟢 | ✅ |
 | [Configurações arrastáveis por qualquer parte](#-configurações-arrastáveis-por-qualquer-parte) 🔁 | 🟢 | ✅ |
 | [Abrir links pelo serviço do sistema](#-abrir-links-pelo-serviço-do-sistema) 🔁 | 🟢 | ✅ |
@@ -23,7 +22,6 @@ Itens marcados com **🔁 Ai Usage** já existem no projeto irmão [Widget Ai Us
 | [Filtro por preço máximo](#-filtro-por-preço-máximo) | 🟢 | ✅ |
 | [Mais testes e ferramentas de desenvolvimento](#-mais-testes-e-ferramentas-de-desenvolvimento) 🔁 | 🟢 | ✅ |
 | [Ajustes visuais a decidir](#-ajustes-visuais-a-decidir) 🔁 | 🟢 | aguarda decisão |
-| [Notificação quando um jogo entrar em promoção](#-notificação-quando-um-jogo-entrar-em-promoção) 🔁 | 🟡 | |
 | [Três tamanhos de widget](#-três-tamanhos-de-widget) 🔁 | 🟡 | |
 | [Mostrar até quando vai a promoção](#-mostrar-até-quando-vai-a-promoção) | 🟡 | |
 | [Melhorias de acessibilidade](#-melhorias-de-acessibilidade) | 🟡 | |
@@ -33,23 +31,7 @@ Itens marcados com **🔁 Ai Usage** já existem no projeto irmão [Widget Ai Us
 | [Suporte a Linux](#-suporte-a-linux) | 🔴 | |
 | [Login com a Steam](#-login-com-a-steam-em-estudo) | 🔴 | em estudo |
 
-**Ordem sugerida:** ícone e notificações (andam juntos, porque o Windows usa o ícone do `.exe` na notificação), depois o README com as imagens novas, depois os tamanhos. Os itens pequenos podem entrar junto com qualquer um deles.
-
----
-
-## 🖼️ Ícone próprio do app
-
-**Dificuldade:** 🟢 fácil · 🔁 Ai Usage
-
-Hoje o `.exe` e as janelas usam o ícone genérico. Um ícone próprio aparece no Explorer, na barra de tarefas (janela de configurações), no Alt+Tab e nas notificações do Windows.
-
-**Como fazer**
-- Criar o ícone (sugestão: o logo da Steam estilizado com um coração ou uma etiqueta de desconto, legível em 16 px) em `src/SteamWishlistWidget/Assets/icon.ico`, com tamanhos de 16 a 256 px (PNG dentro do `.ico`)
-- No `SteamWishlistWidget.csproj`: `<ApplicationIcon>Assets\icon.ico</ApplicationIcon>` e `<AssemblyTitle>Steam Wishlist Widget</AssemblyTitle>` (é o nome que o Windows mostra nas notificações)
-- `Icon` nas duas janelas (`MainWindow` e `SettingsWindow`)
-- Uma versão `docs/images/icon.png` (256 px) para o topo do README
-
-**Ponto de atenção:** o ícone precisa respeitar a [marca da Steam](https://partner.steamgames.com/doc/marketing/branding): usar o logo como referência visual, sem sugerir que o widget é oficial da Valve.
+**Ordem sugerida:** o README com as imagens novas (o ícone e as notificações já estão prontos), depois os tamanhos. Os itens pequenos podem entrar junto com qualquer um deles.
 
 ---
 
@@ -61,7 +43,7 @@ Hoje o `.exe` e as janelas usam o ícone genérico. Um ícone próprio aparece n
 - **Selos** de versão, downloads e CI (apontando para `ci.yml` na `develop`), licença e tecnologias (.NET 10, Avalonia 12, Windows 10/11, "Linux em breve")
 - **Atalhos** no topo: Baixar · Primeiros passos · Perguntas frequentes · Guia técnico
 - **Tabela de imagens** com os três temas, incluindo o **Vidro**, que hoje falta, e a tela de configurações (e os tamanhos, quando existirem). Sempre geradas no modo demonstração
-- **Versão mínima do Windows** (Windows 10 versão 2004 ou mais nova, se as notificações exigirem)
+- **Versão mínima do Windows**: Windows 10 versão 2004 ou mais nova (o app compila para `net10.0-windows10.0.19041.0` por causa das notificações)
 - **Aviso:** guardar o `.exe` numa pasta fixa **antes** de ligar "Iniciar com o Windows", porque se o arquivo mudar de lugar o Windows não o encontra mais
 - Seção **Perguntas frequentes** no lugar de "Problemas comuns", juntando as dúvidas de uso e de erro
 
@@ -160,31 +142,6 @@ No Ai Usage, estes dois pontos foram decisões explícitas do usuário. Aqui só
 
 - **Botões do cabeçalho sem dica (tooltip):** lá a dica atrapalhava o clique e foi removida (fica só o `AutomationProperties.Name`, para leitores de tela). Aqui os botões ainda mostram a dica.
 - **Alfinete "fixado" com destaque:** lá o alfinete fixado fica preenchido na cor `Accent` com fundo `AccentSoft` (classe `active` no `Button.icon`). Aqui foi pedido para não usar o azul; hoje ele só fica preenchido, na mesma cor dos outros ícones.
-
----
-
-## 🔔 Notificação quando um jogo entrar em promoção
-
-**Dificuldade:** 🟡 média · 🔁 Ai Usage
-
-Uma notificação do Windows quando, numa atualização, um jogo da lista que estava sem desconto aparecer em promoção. Exemplo: "Hades entrou em promoção" / "-50%: de R$ 73,99 por R$ 36,99".
-
-**Como no Ai Usage (avisos de 80% e 95%)**
-- **Regra no Core, testada:** uma classe como o `UsageAlertTracker` de lá (aqui, algo como `SaleAlertTracker`) guarda os AppIDs que estavam em promoção e devolve só os que **entraram agora**
-- **A primeira leitura é só a base:** abrir o widget com jogos já em promoção **não** avisa. O mesmo vale depois de trocar de perfil (zera a base)
-- Se o jogo sair da promoção e voltar depois, avisa de novo
-- `INotificationService` em `Core/Services/Abstractions`, `NoNotificationService` (não faz nada) para o modo demonstração e outros sistemas, e `Platform/Windows/WindowsNotificationService.cs` com o toast nativo
-- Interruptor **"Avisar quando um jogo entrar em promoção"** nas configurações (`AppSettings.Notifications`, padrão ligado)
-- O `WidgetViewModel` chama o tracker depois de cada leitura e só mostra se a opção estiver ligada
-
-**Detalhes técnicos que o Ai Usage já resolveu**
-- Pacote `Microsoft.Toolkit.Uwp.Notifications` 7.1.3, que exige o alvo do Windows 10: no csproj do app, `net10.0-windows10.0.19041.0` quando compilado no Windows e `net10.0` fora dele (o código fica dentro de `#if WINDOWS`)
-- Esse pacote puxa o `System.Drawing.Common` 4.7.0, que tem falha de segurança conhecida: fixar a 10.0.0 no csproj (sem isso o build falha com NU1904)
-- Na primeira notificação, o pacote registra o app no registro do usuário (`HKCU\Software\Classes\AppUserModelId\<caminho do exe>`), com o nome do `AssemblyTitle` e o ícone do `.exe`: por isso o [ícone próprio](#-ícone-próprio-do-app) vem antes
-- Para conferir: o histórico de notificações pode ser lido pelo Windows PowerShell 5.1 com `[Windows.UI.Notifications.ToastNotificationManager]::History.GetHistory(<AUMID>)`
-- No Linux (futuro), a central de notificações do ambiente gráfico, via D-Bus
-
-**Ponto de atenção:** com a lista atualizando a cada 15 minutos a 3 horas, a promoção é notada com algum atraso. Clicar na notificação poderia abrir a página do jogo na loja.
 
 ---
 
@@ -356,7 +313,7 @@ Distribuir o widget também para Linux, aumentando o público e a quantidade de 
 | **Criptografia do SteamID** (`ISecretProtector`) | Secret Service / libsecret (GNOME Keyring, KWallet), via D-Bus ou `secret-tool` |
 | **Iniciar com o sistema** (`IStartupRegistration`) | Arquivo `.desktop` em `~/.config/autostart` |
 | **Abrir a loja** | `xdg-open` (veja [Abrir links pelo serviço do sistema](#-abrir-links-pelo-serviço-do-sistema)) |
-| **Notificações** | Central de notificações do ambiente gráfico, via D-Bus (quando as [notificações](#-notificação-quando-um-jogo-entrar-em-promoção) existirem) |
+| **Notificações** | Central de notificações do ambiente gráfico, via D-Bus, implementando `INotificationService` (hoje fora do Windows é `NoNotificationService`) |
 | **Efeito vidro** | Depende do compositor; muitas vezes só há transparência sem desfoque. Mostrar o tema Escuro como alternativa |
 | **Posição da janela** | No **Wayland**, o app não pode escolher a posição da janela nem garantir "sempre visível"; funciona no X11 e pelo XWayland |
 | **Pastas de dados** | `~/.config` e `~/.local/share` (o .NET já resolve) |

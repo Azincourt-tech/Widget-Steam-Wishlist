@@ -6,6 +6,7 @@
         x:Class="SteamWishlistWidget.Views.MainWindow"
         x:DataType="vm:WidgetViewModel"
         Title="Steam Wishlist Widget"
+        Icon="/Assets/icon.ico"
         SizeToContent="WidthAndHeight"
         WindowDecorations="None"
         Background="Transparent"

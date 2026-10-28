@@ -44,6 +44,7 @@ public partial class App : Application
         ISettingsStore store;
         ISteamApiClient steam;
         IStartupRegistration startup;
+        INotificationService notifications;
         if (options.Demo)
         {
             // Dados fictícios, sem tocar no config.json, no registro nem na conta Steam do usuário.
@@ -51,12 +52,14 @@ public partial class App : Application
             store = new InMemorySettingsStore(demoSettings);
             steam = new DemoSteamApiClient();
             startup = new InMemoryStartupRegistration();
+            notifications = new NoNotificationService();
         }
         else
         {
             store = new SettingsStore(AppConstants.SettingsFile, PlatformServices.CreateSecretProtector());
             steam = new SteamApiClient();
             startup = PlatformServices.CreateStartupRegistration();
+            notifications = PlatformServices.CreateNotificationService();
         }
 
         var settings = store.Load();
@@ -66,7 +69,7 @@ public partial class App : Application
         // As cores precisam existir antes da primeira janela ser criada.
         themes.Apply(settings.Theme);
 
-        var viewModel = new WidgetViewModel(settings, steam, store, new StoreLauncher(), themes, dialogs, new AvaloniaUiTimer());
+        var viewModel = new WidgetViewModel(settings, steam, store, new StoreLauncher(), themes, dialogs, notifications, new AvaloniaUiTimer());
         return new MainWindow(viewModel);
     }
 }
